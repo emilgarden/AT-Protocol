@@ -1,39 +1,54 @@
 // src/components/Profile.jsx
 import React, { useState, useEffect } from 'react';
+import Feed from './Feed';
 
 const ProfileHeader = ({ profile, handleFollow, isFollowing }) => {
   return (
-    <div className="border rounded-lg p-6 mb-4">
-      <div className="flex items-start space-x-4">
-        <img 
-          src={profile.avatar} 
-          alt={profile.displayName} 
-          className="w-20 h-20 rounded-full"
-        />
-        <div className="flex-1">
-          <div className="flex justify-between items-start">
-            <div>
-              <h2 className="text-xl font-bold">{profile.displayName}</h2>
-              <p className="text-gray-600">@{profile.handle}</p>
+    <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+      <div className="h-32 bg-gradient-to-r from-blue-400 to-blue-600"></div>
+      <div className="p-6">
+        <div className="flex items-start space-x-4">
+          <img 
+            src={profile.avatar} 
+            alt={profile.displayName} 
+            className="w-24 h-24 rounded-full border-4 border-white shadow-sm -mt-12"
+          />
+          <div className="flex-1 pt-2">
+            <div className="flex justify-between items-start">
+              <div>
+                <h2 className="text-2xl font-bold text-gray-900">{profile.displayName}</h2>
+                <p className="text-gray-600">@{profile.handle}</p>
+              </div>
+              {handleFollow && (
+                <button
+                  onClick={handleFollow}
+                  className={`px-6 py-2 rounded-full transition-colors ${
+                    isFollowing
+                      ? 'bg-gray-100 hover:bg-gray-200 text-gray-800'
+                      : 'bg-blue-500 hover:bg-blue-600 text-white'
+                  }`}
+                >
+                  {isFollowing ? 'Følger' : 'Følg'}
+                </button>
+              )}
             </div>
-            {handleFollow && (
-              <button
-                onClick={handleFollow}
-                className={`px-4 py-2 rounded-full ${
-                  isFollowing
-                    ? 'bg-gray-200 hover:bg-gray-300'
-                    : 'bg-blue-500 text-white hover:bg-blue-600'
-                }`}
-              >
-                {isFollowing ? 'Følger' : 'Følg'}
-              </button>
+            {profile.description && (
+              <p className="mt-4 text-gray-700">{profile.description}</p>
             )}
-          </div>
-          <p className="mt-2">{profile.description}</p>
-          <div className="mt-4 flex space-x-4 text-sm text-gray-600">
-            <span>{profile.followersCount} følgere</span>
-            <span>{profile.followsCount} følger</span>
-            <span>{profile.postsCount} innlegg</span>
+            <div className="mt-4 flex space-x-6 text-sm">
+              <div>
+                <span className="font-semibold text-gray-900">{profile.followersCount}</span>
+                <span className="ml-1 text-gray-500">følgere</span>
+              </div>
+              <div>
+                <span className="font-semibold text-gray-900">{profile.followsCount}</span>
+                <span className="ml-1 text-gray-500">følger</span>
+              </div>
+              <div>
+                <span className="font-semibold text-gray-900">{profile.postsCount}</span>
+                <span className="ml-1 text-gray-500">innlegg</span>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -43,25 +58,29 @@ const ProfileHeader = ({ profile, handleFollow, isFollowing }) => {
 
 const FollowList = ({ users, type, onUserClick }) => {
   return (
-    <div className="border rounded-lg p-4">
-      <h3 className="text-lg font-semibold mb-4">
-        {type === 'followers' ? 'Følgere' : 'Følger'}
-      </h3>
-      <div className="space-y-4">
+    <div className="bg-white rounded-lg shadow-sm border border-gray-200">
+      <div className="p-4 border-b border-gray-200">
+        <h3 className="text-lg font-semibold text-gray-900">
+          {type === 'followers' ? 'Følgere' : 'Følger'}
+        </h3>
+      </div>
+      <div className="divide-y divide-gray-200">
         {users.map((user) => (
           <div 
             key={user.did} 
-            className="flex items-center space-x-3 p-2 hover:bg-gray-50 rounded cursor-pointer"
+            className="p-4 hover:bg-gray-50 cursor-pointer transition-colors"
             onClick={() => onUserClick(user.handle)}
           >
-            <img 
-              src={user.avatar} 
-              alt={user.displayName} 
-              className="w-10 h-10 rounded-full"
-            />
-            <div>
-              <div className="font-medium">{user.displayName}</div>
-              <div className="text-sm text-gray-600">@{user.handle}</div>
+            <div className="flex items-center space-x-3">
+              <img 
+                src={user.avatar} 
+                alt={user.displayName} 
+                className="w-12 h-12 rounded-full"
+              />
+              <div>
+                <div className="font-medium text-gray-900">{user.displayName}</div>
+                <div className="text-sm text-gray-500">@{user.handle}</div>
+              </div>
             </div>
           </div>
         ))}
@@ -70,7 +89,7 @@ const FollowList = ({ users, type, onUserClick }) => {
   );
 };
 
-const Profile = ({ agent, handle }) => {
+const Profile = ({ agent, handle, onProfileClick }) => {
   const [profile, setProfile] = useState(null);
   const [followers, setFollowers] = useState([]);
   const [following, setFollowing] = useState([]);
@@ -87,7 +106,6 @@ const Profile = ({ agent, handle }) => {
         setProfile(profileResponse.data);
         setIsFollowing(profileResponse.data.viewer?.following);
 
-        // Hent følgere og følger samtidig
         const [followersRes, followingRes] = await Promise.all([
           agent.getFollowers({ actor: handle }),
           agent.getFollows({ actor: handle })
@@ -103,7 +121,9 @@ const Profile = ({ agent, handle }) => {
       }
     };
 
-    fetchProfile();
+    if (agent && handle) {
+      fetchProfile();
+    }
   }, [agent, handle]);
 
   const handleFollow = async () => {
@@ -114,7 +134,6 @@ const Profile = ({ agent, handle }) => {
         await agent.follow(profile.did);
       }
       setIsFollowing(!isFollowing);
-      // Oppdater følgertall
       setProfile(prev => ({
         ...prev,
         followersCount: isFollowing ? prev.followersCount - 1 : prev.followersCount + 1
@@ -124,82 +143,100 @@ const Profile = ({ agent, handle }) => {
     }
   };
 
-  const handleUserClick = (userHandle) => {
-    // Her kan du implementere navigasjon til brukerens profil
-    console.log(`Navigate to ${userHandle}'s profile`);
-  };
-
   if (loading) {
-    return <div className="text-center p-4">Laster profil...</div>;
+    return (
+      <div className="flex justify-center items-center py-8">
+        <div className="text-gray-500">Laster profil...</div>
+      </div>
+    );
   }
 
   if (error) {
-    return <div className="text-center p-4 text-red-500">{error}</div>;
+    return (
+      <div className="bg-red-50 border border-red-200 rounded-lg p-4 text-red-700 text-center">
+        {error}
+      </div>
+    );
   }
 
   if (!profile) {
-    return <div className="text-center p-4">Fant ikke profilen</div>;
+    return (
+      <div className="bg-gray-50 border border-gray-200 rounded-lg p-8 text-center">
+        <p className="text-gray-500">Fant ikke profilen</p>
+      </div>
+    );
   }
 
   return (
-    <div className="max-w-2xl mx-auto">
+    <div className="space-y-6">
       <ProfileHeader 
         profile={profile} 
         handleFollow={handle !== profile.handle ? handleFollow : null}
         isFollowing={isFollowing}
       />
       
-      <div className="mb-4">
-        <div className="flex border-b">
+      <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+        <div className="flex border-b border-gray-200">
           <button
-            className={`px-4 py-2 ${
-              activeTab === 'profile' ? 'border-b-2 border-blue-500' : ''
+            className={`flex-1 px-4 py-3 text-sm font-medium transition-colors ${
+              activeTab === 'profile' 
+                ? 'border-b-2 border-blue-500 text-blue-600'
+                : 'text-gray-500 hover:text-gray-700 hover:bg-gray-50'
             }`}
             onClick={() => setActiveTab('profile')}
           >
-            Profil
+            Innlegg
           </button>
           <button
-            className={`px-4 py-2 ${
-              activeTab === 'followers' ? 'border-b-2 border-blue-500' : ''
+            className={`flex-1 px-4 py-3 text-sm font-medium transition-colors ${
+              activeTab === 'followers' 
+                ? 'border-b-2 border-blue-500 text-blue-600'
+                : 'text-gray-500 hover:text-gray-700 hover:bg-gray-50'
             }`}
             onClick={() => setActiveTab('followers')}
           >
             Følgere
           </button>
           <button
-            className={`px-4 py-2 ${
-              activeTab === 'following' ? 'border-b-2 border-blue-500' : ''
+            className={`flex-1 px-4 py-3 text-sm font-medium transition-colors ${
+              activeTab === 'following' 
+                ? 'border-b-2 border-blue-500 text-blue-600'
+                : 'text-gray-500 hover:text-gray-700 hover:bg-gray-50'
             }`}
             onClick={() => setActiveTab('following')}
           >
             Følger
           </button>
         </div>
-      </div>
 
-      {activeTab === 'profile' && (
-        <div className="space-y-4">
-          {/* Her kan du legge til brukerens innlegg */}
-          <p className="text-center text-gray-600">Brukerens innlegg kommer her</p>
+        <div className="p-4">
+          {activeTab === 'profile' && (
+            <div className="-mt-4 -mx-4">
+              <Feed 
+                agent={agent}
+                handle={handle}
+                onProfileClick={onProfileClick}
+              />
+            </div>
+          )}
+          
+          {activeTab === 'followers' && (
+            <FollowList 
+              users={followers}
+              type="followers"
+              onUserClick={onProfileClick}
+            />
+          )}
+          
+          {activeTab === 'following' && (
+            <FollowList 
+              users={following}
+              type="following"
+              onUserClick={onProfileClick}
+            />
+          )}
         </div>
-      )}
-      
-      {activeTab === 'followers' && (
-        <FollowList 
-          users={followers} 
-          type="followers"
-          onUserClick={handleUserClick}
-        />
-      )}
-      
-      {activeTab === 'following' && (
-        <FollowList 
-          users={following} 
-          type="following"
-          onUserClick={handleUserClick}
-        />
-      )}
+      </div>
     </div>
   );
 };
