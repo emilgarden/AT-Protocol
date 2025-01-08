@@ -69,8 +69,9 @@ const PostCard = ({ post, onProfileClick }) => {
                 <img
                     src={post.embed?.images[0]?.fullsize}
                     alt="Post image"
-                    className="max-w-full max-h-96 rounded-lg object-contain"
+                    className="w-64 h-64 rounded-lg object-cover"
                 />
+
               </div>
             )}
 

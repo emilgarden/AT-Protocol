@@ -116,7 +116,7 @@ const App = () => {
       <main className="max-w-5xl mx-auto px-6 sm:px-8 lg:px-12 py-12 space-y-8">
         {!isLoggedIn ? (
           // Login Form
-          <div className="max-w-md mx-auto bg-white rounded-lg shadow p-8">
+          <div className="max-w-md mx-auto bg-gradient-to-br from-blue-500 to-green-500 rounded-lg shadow-lg p-8">
             <h2 className="text-2xl font-bold text-gray-900 mb-6 text-center">
               Logg inn på Bluesky
             </h2>
