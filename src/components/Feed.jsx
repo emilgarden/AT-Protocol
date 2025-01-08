@@ -22,7 +22,7 @@ const PostCard = ({ post, onProfileClick }) => {
   const displayText = isExpanded ? text : text.slice(0, MAX_LENGTH);
 
   return (
-    <div className="bg-white rounded-lg shadow-sm border border-gray-200 hover:border-gray-300 transition-colors">
+    <div className="bg-white rounded-lg shadow-md border border-gray-100 hover:shadow-lg transition-shadow p-4">
       <div className="p-4">
         <div className="flex items-start space-x-4">
           <img
@@ -67,9 +67,9 @@ const PostCard = ({ post, onProfileClick }) => {
             {post.embed?.images?.length > 0 && (
               <div className="mt-3 rounded-lg overflow-hidden">
                 <img
-                  src={post.embed.images[0].fullsize}
-                  alt="Post image"
-                  className="w-full h-auto object-cover"
+                    src={post.embed?.images[0]?.fullsize}
+                    alt="Post image"
+                    className="max-w-full max-h-96 rounded-lg object-contain"
                 />
               </div>
             )}
@@ -154,15 +154,15 @@ const Feed = ({ agent, handle, onProfileClick }) => {
   }
 
   return (
-    <div className="space-y-4">
-      {posts.map((item) => (
-        <PostCard
-          key={item.post.uri}
-          post={item.post}
-          onProfileClick={onProfileClick}
-        />
-      ))}
-    </div>
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+    {posts.map((item) => (
+      <PostCard
+        key={item.post.uri}
+        post={item.post}
+        onProfileClick={onProfileClick}
+      />
+    ))}
+  </div>
   );
 };
 

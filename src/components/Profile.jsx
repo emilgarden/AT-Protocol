@@ -11,7 +11,7 @@ const ProfileHeader = ({ profile, handleFollow, isFollowing }) => {
           <img 
             src={profile.avatar} 
             alt={profile.displayName} 
-            className="w-24 h-24 rounded-full border-4 border-white shadow-sm -mt-12"
+            className="w-16 h-16 rounded-full border-4 border-white shadow-md object-cover"
           />
           <div className="flex-1 pt-2">
             <div className="flex justify-between items-start">

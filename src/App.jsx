@@ -113,7 +113,7 @@ const App = () => {
       </nav>
 
       {/* Main Content */}
-      <main className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <main className="max-w-5xl mx-auto px-6 sm:px-8 lg:px-12 py-12 space-y-8">
         {!isLoggedIn ? (
           // Login Form
           <div className="max-w-md mx-auto bg-white rounded-lg shadow p-8">
